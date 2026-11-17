@@ -1,0 +1,11 @@
+{
+  "name": "chung",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CHUNG bilingual meme website on BNB Chain",
+  "scripts": {
+    "start": "node serve.mjs",
+    "check": "node --check dist/app.js && node --check dist/model.js"
+  },
+  "engines": { "node": ">=18" }
+}

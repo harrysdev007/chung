@@ -1,0 +1,6 @@
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=path.resolve('dist');
+const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.glb':'model/gltf-binary'};
+http.createServer((req,res)=>{const name=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!name.startsWith(root+path.sep)&&name!==root){res.writeHead(403).end();return}const file=name===root?path.join(root,'index.html'):name;fs.stat(file,(err,stat)=>{if(err||!stat.isFile()){res.writeHead(404).end();return}const range=req.headers.range;if(range){const [a,b]=range.replace('bytes=','').split('-');const start=Number(a),end=b?Number(b):stat.size-1;res.writeHead(206,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Content-Range':`bytes ${start}-${end}/${stat.size}`,'Accept-Ranges':'bytes','Content-Length':end-start+1});fs.createReadStream(file,{start,end}).pipe(res)}else{res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Content-Length':stat.size,'Accept-Ranges':'bytes'});fs.createReadStream(file).pipe(res)}})}).listen(4173,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4173'));
